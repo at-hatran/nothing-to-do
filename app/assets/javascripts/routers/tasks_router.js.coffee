@@ -5,12 +5,14 @@ class Railsbackbone.Routers.Tasks extends Backbone.Router
 
   initialize: ->
     @tasks = new Railsbackbone.Collections.Tasks()
-    # @tasks.fetch({reset: true})
+    @tasks.fetch({reset: true})
 
   index: ->
-    new Railsbackbone.Views.TasksIndex collection: @tasks
+    Railsbackbone.TaskFilter = ''
+    view = new Railsbackbone.Views.TasksIndex collection: @tasks
+    # $('.todoapp').html(view.render().el)
 
   setFilter: (params) ->
     console.log('filtering...')
     Railsbackbone.TaskFilter = params || ''
-    @tasks.trigger('filter')
+    new Railsbackbone.Views.TasksIndex collection: @tasks

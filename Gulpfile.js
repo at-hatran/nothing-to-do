@@ -28,26 +28,29 @@ gulp.task('concat-coffee', function() {
 gulp.task('compile-coffee', ['concat-coffee'], function() {
     gulp.src('./tmp/assets/javascripts/app.coffee')
         .pipe(coffee())
-        .pipe(gulp.dest('./tmp/assets/javascripts/'));
+        .pipe(gulp.dest('./tmp/assets/javascripts/build/'));
 });
 
+function clean(done) {
+    del(['./tmp/assets/javascripts/',
+         './tmp/assets/stylesheets/'], done);
+}
+
 gulp.task('clean', function(done) {
-    del(['./tmp/assets/javascripts/*',
-         './tmp/assets/stylesheets/*',
-         './app/assets/javascripts/application.js'], done);
+    clean(done);
 })
 
 gulp.task('concat-js', ['compile-coffee'], function() {
     gulp.src(['./node_modules/underscore/underscore-min.js',
               './node_modules/jquery/dist/jquery.min.js',
               './node_modules/backbone/backbone-min.js',
-              './tmp/assets/javascripts/app.js'])
+              './tmp/assets/javascripts/build/app.js'])
         .pipe(concat('application.js'))
         .pipe(gulp.dest('./app/assets/javascripts/'));
 });
 
 // Watch task
-gulp.task('run', ['clean', 'concat-js'], function() {
+gulp.task('run', ['concat-js'], function() {
     gulp.watch('app/assets/stylesheets/**/*.scss', ['styles']);
     gulp.watch('app/assets/javascripts/**/*.coffee', ['concat-js']);
 });

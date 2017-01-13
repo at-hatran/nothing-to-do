@@ -32,6 +32,7 @@ class Railsbackbone.Views.TasksIndex extends Backbone.View
     'click .toggle-all': 'toggleAllComplete'
   }
 
+
   # At initialization we bind to the relevant events on the `Todos`
   # collection, when items are added or changed. Kick things off by
   # loading any preexisting todos that might be saved in *localStorage*.
@@ -43,8 +44,11 @@ class Railsbackbone.Views.TasksIndex extends Backbone.View
     this.$main = this.$('.main')
     this.$list = $('.todo-list')
 
+    @collection.trigger('filter')
+
     this.listenTo(@collection, 'add', this.addOne)
     this.listenTo(@collection, 'reset', this.addAll)
+    # this.listenTo(@collection, 'reset', this.render)
     this.listenTo(@collection, 'change:completed', this.filterOne)
     this.listenTo(@collection, 'filter', this.filterAll)
     this.listenTo(@collection, 'all', _.debounce(this.render, 0))
@@ -52,7 +56,8 @@ class Railsbackbone.Views.TasksIndex extends Backbone.View
     # Suppresses 'add' events with {reset: true} and prevents the app view
     # from being re-rendered for every model. Only renders when the 'reset'
     # event is triggered at the end of the fetch.
-    @collection.fetch({reset: true})
+    # @collection.fetch({reset: true})
+
 
   # Re-rendering the App just means refreshing the statistics -- the rest
   # of the app doesn't change.
@@ -71,7 +76,7 @@ class Railsbackbone.Views.TasksIndex extends Backbone.View
 
       this.$('.filters li a')
           .removeClass('selected')
-          .filter('[href="#/' + (app.TodoFilter || '') + '"]')
+          .filter('[href="#/' + (Railsbackbone.TaskFilter || '') + '"]')
           .addClass('selected')
     else
       this.$main.hide()
@@ -79,22 +84,27 @@ class Railsbackbone.Views.TasksIndex extends Backbone.View
 
       this.allCheckbox.checked = !remaining
 
+
   # Add a single todo item to the list by creating a view for it, and
   # appending its element to the `<ul>`.
   addOne: (todo) ->
     view = new Railsbackbone.Views.TasksItem({ model: todo })
     this.$list.append(view.render().el)
 
+
   # Add all items in the **Todos** collection at once.
   addAll: ->
     this.$list.html('')
     @collection.each(this.addOne, this)
 
+
   filterOne: (todo) ->
     todo.trigger('visible')
 
+
   filterAll: ->
     @collection.each(this.filterOne, this)
+
 
   # Generate the attributes for a new Todo item.
   newAttributes: ->
@@ -104,6 +114,7 @@ class Railsbackbone.Views.TasksIndex extends Backbone.View
       completed: false
     }
 
+
   # If you hit return in the main input field, create new **Todo** model,
   # persisting it to *localStorage*.
   createOnEnter: (e) ->
@@ -111,10 +122,12 @@ class Railsbackbone.Views.TasksIndex extends Backbone.View
       @collection.create(this.newAttributes())
       this.$input.val('')
 
+
   # Clear all completed todo items, destroying their models.
   clearCompleted: ->
     _.invoke(@collection.completed(), 'destroy')
     return false
+
 
   toggleAllComplete: ->
     completed = this.allCheckbox.checked

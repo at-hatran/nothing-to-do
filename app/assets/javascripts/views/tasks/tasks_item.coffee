@@ -39,9 +39,9 @@ class Railsbackbone.Views.TasksItem extends Backbone.View
 
 
   isHidden: ->
-    return @model.get('completed') ?
-      Railsbackbone.TodoFilter == 'active' : \
-      Railsbackbone.TodoFilter == 'completed'
+    return if @model.get('completed') then \
+      Railsbackbone.TaskFilter == 'active' \
+      else Railsbackbone.TaskFilter == 'completed'
 
 
   # Toggle the `"completed"` state of the model.
